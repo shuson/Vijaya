@@ -34,7 +34,7 @@ module.exports.routes = {
 
   '/': {
     view: 'homepage'
-  }
+  },
 
   /***************************************************************************
   *                                                                          *
@@ -46,4 +46,18 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
+  /**
+  * Store RESTful APIs
+  *
+  **/
+  
+  'POST /Store': {
+    controller: 'Store',
+    action: 'create'
+  },
+
+  'GET /Store': {
+    controller: 'Store',
+    action: 'query'
+  }
 };
