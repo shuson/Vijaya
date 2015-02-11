@@ -50,6 +50,11 @@ module.exports.routes = {
   * Store RESTful APIs
   *
   **/
+
+  'GET /Stores': {
+    controller: 'Store',
+    action: 'index'
+  },
   
   'POST /Store': {
     controller: 'Store',
