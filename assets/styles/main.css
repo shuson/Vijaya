@@ -1,0 +1,10 @@
+#nav {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  right: 60px;
+  top: 25px;
+  height: 40px;
+  line-height: 40px;
+}

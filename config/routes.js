@@ -35,6 +35,9 @@ module.exports.routes = {
   '/': {
     view: 'homepage'
   },
+  '/admin': {
+    view: 'admin'
+  },
 
   /***************************************************************************
   *                                                                          *
@@ -53,7 +56,8 @@ module.exports.routes = {
 
   'GET /Stores': {
     controller: 'Store',
-    action: 'index'
+    action: 'index',
+	view: 'stores'
   },
   
   'POST /Store': {
@@ -64,5 +68,18 @@ module.exports.routes = {
   'GET /Store': {
     controller: 'Store',
     action: 'query'
+  },
+  
+  /**
+  *	Addons RESTful APIs and Backend Admin routes
+  **/
+  
+  'GET /Addons': {
+	controller: "Addon",
+	action: 'index',	
+  },
+  
+  'GET /admin/addons': {
+	view: 'addons'
   }
 };

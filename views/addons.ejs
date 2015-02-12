@@ -1,0 +1,33 @@
+<h3 class="container">You're looking at: <code><%= view.pathFromApp + '.' +view.ext %></code></h3>
+
+<div id="container">
+	{{todo}}
+</div>
+
+ <script>
+	$(function(){
+		var addonController = new Vue({
+			el: '#container'
+		});
+		//get addons 
+		$.ajax({
+			type: "GET",
+			url: '/addons',
+			dataType: 'json',
+			beforeSend: function (xhr) {
+
+			},
+			complete: function(){
+				
+			},
+			success: function (result, textStatus, jqXHR) {		
+					
+				addonController.$data = result;
+
+			},
+			error: function(xhr, textStatus, errorThrown){
+					alert("Error in getting addons "+textStatus);
+			}
+		});
+	})
+ </script>
