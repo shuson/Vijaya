@@ -75,11 +75,16 @@ module.exports.routes = {
   **/
   
   'GET /Addons': {
-	controller: "Addon",
-	action: 'index',	
+	   controller: "Addon",
+	   action: 'index',	
   },
   
   'GET /admin/addons': {
 	view: 'addons'
+  },
+
+  'POST /addon': {
+      controller: "Addon",
+      action: 'create'
   }
 };

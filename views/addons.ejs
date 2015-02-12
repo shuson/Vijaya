@@ -1,14 +1,53 @@
 <h3 class="container">You're looking at: <code><%= view.pathFromApp + '.' +view.ext %></code></h3>
 
 <div id="container">
-	{{todo}}
+	<table id="addonsTable" class="table">
+		<tr>
+			<th>Name</th>
+			<th>Price</th>
+			<th>Action</th>
+		</tr>
+		<tr v-repeat='addons'>
+			<td>{{name}}</td>
+			<td>{{price}}</td>
+			<td><a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-addonname='{{name}}' data-addonprice='{{price}}'>Edit</a></td>
+		</tr>
+	</table>
+	<button id="add" class="btn btn-primary" data-toggle="modal" data-target="#editModal">Create</button>
 </div>
 
+<div id="editModal" class="modal fade">
+<div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="modalLabel">Edit</h4>
+      </div>
+      <div class="modal-body">
+      	Addon Name: <input id='addonName' type='text' /><br />
+		Addon Price: <input id='addonPrice' type='text' />
+      </div>
+      <div class="modal-footer">
+        <button id="cancelChange" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="saveChange" type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
  <script>
 	$(function(){
 		var addonController = new Vue({
-			el: '#container'
+			el: '#container',
+			methods: {
+				edit: function(name, price, e){
+					alert('name: '+name);
+				}
+			}
 		});
+
+		//edit or create flag
+		var METHOD = "POST";
+
 		//get addons 
 		$.ajax({
 			type: "GET",
@@ -28,6 +67,51 @@
 			error: function(xhr, textStatus, errorThrown){
 					alert("Error in getting addons "+textStatus);
 			}
+		});
+
+		//edit modal
+		$('#editModal').on('show.bs.modal', function (e) {
+ 			var target = e.relatedTarget;
+ 			var name = target.dataset.addonname;
+ 			var price = target.dataset.addonprice;
+
+ 			if(name){
+ 				METHOD = "PUT";
+ 			}
+
+ 			$('#addonName').val(name);
+ 			$('#addonPrice').val(price);
+		});
+
+		//cancel change
+		$('#cancelChange').click(function(){
+			$('#addonName').val('');
+ 			$('#addonPrice').val('');
+		});
+
+		$('#saveChange').click(function(){
+			//confirm("Save Changes?");
+			var addon = {};
+			var name = $('#addonName').val();
+ 			var price = $('#addonPrice').val();
+ 			$('#editModal').modal('hide')
+ 			addon = {
+ 				name: name,
+ 				price: price
+ 			}
+
+			$.ajax({
+				type: METHOD,
+				url: '/addon',
+				data: addon,
+				dataType: 'json',
+				success: function(result){
+					console.log(result.message);
+				},
+				error: function(jqXhr, textStatus, errorThrown){
+					console.log(errorThrown);
+				}
+			});
 		});
 	})
  </script>

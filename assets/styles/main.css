@@ -8,3 +8,9 @@
   height: 40px;
   line-height: 40px;
 }
+
+#container{
+	width: 70%;
+	margin-left: 8%;
+	margin-top: 2%;
+}

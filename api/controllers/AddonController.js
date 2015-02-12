@@ -13,8 +13,8 @@ module.exports = {
    * `AddonController.index()`
    */
   index: function (req, res) {
-    return res.json({
-      todo: 'index() is not implemented yet!'
+    Addon.find().exec(function(err, addons){
+        return res.json({addons: addons});
     });
   },
 
@@ -22,9 +22,22 @@ module.exports = {
    * `AddonController.create()`
    */
   create: function (req, res) {
-    return res.json({
-      todo: 'create() is not implemented yet!'
-    });
+
+    var addon = req.body;
+    console.log(addon);
+    if(addon && addon.name || addon.price){
+      Addon.create(addon).exec(function(err, addon){
+          if(err){
+            return res.json({message: err});
+          }
+          return res.json({message: addon});
+      });
+    }
+    if(!addon){
+       return res.json({
+          message: 'Data is invalid!'
+      });
+    }  
   },
 
 
