@@ -55,19 +55,30 @@ module.exports = {
    * `AddonController.update()`
    */
   update: function (req, res) {
-    return res.json({
-      todo: 'update() is not implemented yet!'
-    });
+	var addon = req.body;
+	Addon.update({id: addon.id},{name: addon.name, price: addon.price}).exec(function afterwards(err,updated){
+			if (err) {
+				return res.json({message: err});
+			}else{
+				return res.json({message: updated});
+			}
+			console.log('Updated addon to have name '+updated[0].name);
+	});
   },
 
 
   /**
    * `AddonController.deletete()`
    */
-  deletete: function (req, res) {
-    return res.json({
-      todo: 'deletete() is not implemented yet!'
-    });
+  delete: function (req, res) {
+	var addon = req.body;
+	Addon.destroy({id: addon.id}).exec(function afterwards(err){
+			if (err) {
+				return res.json({message: err});
+			}else{
+				return res.json({message: "Success"});
+			}
+	});
   }
 };
 

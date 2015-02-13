@@ -1,4 +1,4 @@
-<h3 class="container">You're looking at: <code><%= view.pathFromApp + '.' +view.ext %></code></h3>
+<h3 class="container">Addon Administration Page</h3>
 
 <div id="container">
 	<table id="addonsTable" class="table">
@@ -10,7 +10,10 @@
 		<tr v-repeat='addons'>
 			<td>{{name}}</td>
 			<td>{{price}}</td>
-			<td><a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-addonname='{{name}}' data-addonprice='{{price}}'>Edit</a></td>
+			<td>
+				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-addonname='{{name}}' data-addonprice='{{price}}'>Edit</button> 			
+				<button class="btn btn-danger btn-sm" data-pk="{{id}}" v-on="click: onDelete(id, $event)">Delete</button>
+			</td>
 		</tr>
 	</table>
 	<button id="add" class="btn btn-primary" data-toggle="modal" data-target="#editModal">Create</button>
@@ -21,11 +24,18 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="modalLabel">Edit</h4>
+        <h4 class="modal-title" id="modalLabel">Create</h4>
       </div>
       <div class="modal-body">
-      	Addon Name: <input id='addonName' type='text' /><br />
-		Addon Price: <input id='addonPrice' type='text' />
+		<input id='pk' type="hidden" class="form-control" />
+		<div class="input-group">
+		  <span class="input-group-addon" id="addonNameLabel">Addon Name</span>
+		  <input id='addonName' type="text" class="form-control" placeholder="Addon Name" />
+		</div><br />
+		<div class="input-group">
+		  <span class="input-group-addon" id="addonPriceLabel">Addon Price</span>
+		  <input id='addonPrice' type="text" class="form-control" placeholder="Addon Price" />
+		</div>
       </div>
       <div class="modal-footer">
         <button id="cancelChange" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -39,8 +49,22 @@
 		var addonController = new Vue({
 			el: '#container',
 			methods: {
-				edit: function(name, price, e){
-					alert('name: '+name);
+				onDelete: function(id, e){
+					if(confirm("Delete this record?")){
+						$.ajax({
+							type: "DELETE",
+							url: '/addon',
+							data: {id: id},
+							dataType: 'json',
+							success: function(result){
+								console.log(result.message);
+								load();
+							},
+							error: function(jqXhr, textStatus, errorThrown){
+								console.log(errorThrown);
+							}
+						});
+					}
 				}
 			}
 		});
@@ -48,54 +72,64 @@
 		//edit or create flag
 		var METHOD = "POST";
 
-		//get addons 
-		$.ajax({
-			type: "GET",
-			url: '/addons',
-			dataType: 'json',
-			beforeSend: function (xhr) {
+		//get addons
+		function load(){
+			$.ajax({
+				type: "GET",
+				url: '/addons',
+				dataType: 'json',
+				beforeSend: function (xhr) {
 
-			},
-			complete: function(){
-				
-			},
-			success: function (result, textStatus, jqXHR) {		
+				},
+				complete: function(){
 					
-				addonController.$data = result;
+				},
+				success: function (result, textStatus, jqXHR) {		
+						
+					addonController.$data = result;
 
-			},
-			error: function(xhr, textStatus, errorThrown){
-					alert("Error in getting addons "+textStatus);
-			}
-		});
+				},
+				error: function(xhr, textStatus, errorThrown){
+						alert("Error in getting addons "+textStatus);
+				}
+			});
+		}
+		load();
+		
 
 		//edit modal
 		$('#editModal').on('show.bs.modal', function (e) {
  			var target = e.relatedTarget;
  			var name = target.dataset.addonname;
  			var price = target.dataset.addonprice;
-
+			
  			if(name){
  				METHOD = "PUT";
  			}
-
+			
+			$("#modalLabel").text(target.textContent);
+			
+			$('#pk').val(target.dataset.pk);
  			$('#addonName').val(name);
  			$('#addonPrice').val(price);
 		});
 
-		//cancel change
+		//cancel changes
 		$('#cancelChange').click(function(){
 			$('#addonName').val('');
  			$('#addonPrice').val('');
 		});
-
+		
+		//save changes
 		$('#saveChange').click(function(){
 			//confirm("Save Changes?");
 			var addon = {};
+			var pk = $('#pk').val();
 			var name = $('#addonName').val();
  			var price = $('#addonPrice').val();
  			$('#editModal').modal('hide')
  			addon = {
+				id: pk,
  				name: name,
  				price: price
  			}
@@ -107,11 +141,13 @@
 				dataType: 'json',
 				success: function(result){
 					console.log(result.message);
+					load();
 				},
 				error: function(jqXhr, textStatus, errorThrown){
 					console.log(errorThrown);
 				}
 			});
 		});
+		
 	})
  </script>

@@ -86,5 +86,15 @@ module.exports.routes = {
   'POST /addon': {
       controller: "Addon",
       action: 'create'
+  },
+  
+  'PUT /addon': {
+      controller: "Addon",
+      action: 'update'
+  },
+  
+  'DELETE /addon': {
+      controller: "Addon",
+      action: 'delete'
   }
 };
