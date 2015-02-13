@@ -56,7 +56,10 @@ module.exports.routes = {
 
   'GET /Stores': {
     controller: 'Store',
-    action: 'index',
+    action: 'index'
+  },
+  
+  'GET /admin/Stores': {
 	view: 'stores'
   },
   
@@ -65,9 +68,47 @@ module.exports.routes = {
     action: 'create'
   },
 
-  'GET /Store': {
+  'PUT /Store': {
+    controller: 'Store',
+    action: 'update'
+  },
+  
+  'GET /Store:id': {
     controller: 'Store',
     action: 'query'
+  },
+  
+  'DELETE /Store': {
+    controller: 'Store',
+    action: 'delete'
+  },
+  
+  /**
+  *	Products RESTful APIs and Backend Admin routes
+  **/
+  
+  'GET /admin/Products': {
+	view: 'products'
+  },
+  
+  'GET /Products': {
+	controller: "Product",
+	action: 'index'
+  },
+  
+  'POST /Product': {
+	controller: "Product",
+	action: 'create'
+  },
+  
+  'PUT /Product': {
+	controller: "Product",
+	action: 'update'
+  },
+  
+  'DELETE /Product': {
+	controller: "Product",
+	action: 'delete'
   },
   
   /**
@@ -77,6 +118,11 @@ module.exports.routes = {
   'GET /Addons': {
 	   controller: "Addon",
 	   action: 'index',	
+  },
+  
+  'GET /Addon/:id': {
+	   controller: "Addon",
+	   action: 'query',	
   },
   
   'GET /admin/addons': {

@@ -1,1 +1,179 @@
-test stores
+<h3 class="container">Store Management</h3>
+
+<div id="container">
+	<table id="storesTable" class="table">
+		<tr>
+			<th>Name</th>
+			<th>Brand</th>
+			<th>Address</th>
+			<th>Type</th>
+			<th>Action</th>
+		</tr>
+		<tr v-repeat='stores'>
+			<td>{{name}}</td>
+			<td>{{brand}}</td>
+			<td>{{address}}</td>
+			<td>{{type}}</td>
+			<td>
+				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-name='{{name}}' data-address='{{address}}' data-brand='{{brand}}' data-type='{{type}}'>Edit</button> 			
+				<button class="btn btn-danger btn-sm" data-pk="{{id}}" v-on="click: onDelete(id, $event)">Delete</button>
+			</td>
+		</tr>
+	</table>
+	<button id="add" class="btn btn-primary" data-toggle="modal" data-target="#editModal">Create</button>
+</div>
+
+<div id="editModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="modalLabel">Create</h4>
+      </div>
+      <div class="modal-body">
+		<input id='pk' type="hidden" class="form-control" />
+		<div class="input-group">
+		  <span class="input-group-addon" id="nameLabel">Name</span>
+		  <input id='storeName' type="text" class="form-control" placeholder="Store Name" />
+		</div><br />
+		<div class="input-group">
+		  <span class="input-group-addon" id="addressLabel">Brand</span>
+		  <input id='brand' type="text" class="form-control" placeholder="brand" />
+		</div><br />
+		<div class="input-group">
+		  <span class="input-group-addon" id="addressLabel">Address</span>
+		  <input id='address' type="text" class="form-control" placeholder="address" />
+		</div><br />
+		<div class="input-group">
+		  <span class="input-group-addon" id="addressLabel">Type</span>
+			<select id='type' class="form-control">
+				<option>Beverage</option>
+				<option>Food</option>
+				<option>Desert</option>
+			</select>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelChange" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="saveChange" type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+$(function(){
+	var storeController = new Vue({
+		el: '#container',
+		methods: {
+			onDelete: function(id, e){
+				if(confirm("Delete this record?")){
+					$.ajax({
+						type: "DELETE",
+						url: '/store',
+						data: {id: id},
+						dataType: 'json',
+						success: function(result){
+							console.log(result.message);
+							load();
+						},
+						error: function(jqXhr, textStatus, errorThrown){
+							console.log(errorThrown);
+						}
+					});
+				}
+			}
+		}
+	});
+	
+	//edit or create flag
+	var METHOD = "POST";
+
+	//get store
+	function load(){
+		$.ajax({
+			type: "GET",
+			url: '/stores',
+			dataType: 'json',
+			beforeSend: function (xhr) {
+
+			},
+			complete: function(){
+					
+			},
+			success: function (result, textStatus, jqXHR) {							
+				storeController.$data = result;
+			},
+			error: function(xhr, textStatus, errorThrown){
+				alert("Error in getting addons "+textStatus);
+			}
+		});
+	}
+	load();
+	
+	//edit modal
+	$('#editModal').on('show.bs.modal', function (e) {
+ 		var target = e.relatedTarget;
+ 		var name = target.dataset.name;
+		var brand = target.dataset.brand;
+ 		var address = target.dataset.address;
+		var type = target.dataset.type;
+		
+ 		if(name){
+ 			METHOD = "PUT";
+ 		}
+			
+		$("#modalLabel").text(target.textContent);
+		
+		$('#pk').val(target.dataset.pk);
+ 		$('#storeName').val(name);
+		$('#brand').val(brand);
+ 		$('#address').val(address);
+		$('#type').val(type);
+	});
+
+	//cancel changes
+	$('#cancelChange').click(function(){
+		$('#storeName').val('');
+		$('#brand').val('');
+ 		$('#address').val('');
+		$('#type').val('Beverage');
+	});
+		
+	//save changes
+	$('#saveChange').click(function(){
+		//confirm("Save Changes?");
+		var store = {};
+		var pk = $('#pk').val();
+		var name = $('#storeName').val();
+		var brand = $('#brand').val();
+ 		var address = $('#address').val();
+		var type = $('#type').val();
+ 		$('#editModal').modal('hide');
+		
+ 		store = {
+			id: pk,
+ 			name: name,
+			brand: brand,
+ 			address: address,
+			type: type
+ 		}
+
+		$.ajax({
+			type: METHOD,
+			url: '/store',
+			data: store,
+			dataType: 'json',
+			success: function(result){
+				console.log(result.message);
+				load();
+			},
+			error: function(jqXhr, textStatus, errorThrown){
+				console.log(errorThrown);
+			}
+		});
+	});
+})
+	
+</script>

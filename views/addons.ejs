@@ -20,7 +20,7 @@
 </div>
 
 <div id="editModal" class="modal fade">
-<div class="modal-dialog">
+  <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -84,13 +84,11 @@
 				complete: function(){
 					
 				},
-				success: function (result, textStatus, jqXHR) {		
-						
+				success: function (result, textStatus, jqXHR) {								
 					addonController.$data = result;
-
 				},
 				error: function(xhr, textStatus, errorThrown){
-						alert("Error in getting addons "+textStatus);
+					alert("Error in getting addons "+textStatus);
 				}
 			});
 		}

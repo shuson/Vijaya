@@ -1,0 +1,227 @@
+<h3 class="container">Product Management</h3>
+
+<div id="container">
+	<table id="productTable" class="table">
+		<tr>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Store</th>
+			<th>Price</th>
+			<th>Action</th>
+		</tr>
+		<tr v-repeat='stores'>
+			<td>{{name}}</td>
+			<td>{{type}}</td>
+			<td>{{storeName}}</td>
+			<td>
+				<ul class="list-group">
+				  <li role="presentation">Small <span class="badge">{{price[0]}}</span></li>
+				  <li role="presentation">medium <span class="badge">{{price[1]}}</span></li>
+				  <li role="presentation">Big <span class="badge">{{price[2]}}</span></li>
+				</ul>
+			</td>
+			<td>
+				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-name='{{name}}' data-type='{{type}}' data-store='{{storeName}}' data-price='{{price}}' >Edit</button> 			
+				<button class="btn btn-danger btn-sm" data-pk="{{id}}" v-on="click: onDelete(id, $event)">Delete</button>
+			</td>
+		</tr>
+	</table>
+	<button id="add" class="btn btn-primary" data-toggle="modal" data-target="#editModal">Create</button>
+</div>
+
+<div id="editModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="modalLabel">Create</h4>
+      </div>
+      <div class="modal-body">
+		<input id='pk' type="hidden" class="form-control" />
+		<div class="input-group">
+		  <span class="input-group-addon" id="nameLabel">Name</span>
+		  <input id='productName' type="text" class="form-control" placeholder="Product Name" />
+		</div><br />
+		<div class="input-group">
+		  <span class="input-group-addon" id="addressLabel">Type</span>
+		  <select id='type' class="form-control">
+				<option>Coffee</option>
+				<option>Juice</option>
+				<option>Chocolate</option>
+			</select>
+		</div><br />
+		<div class="input-group">
+		  <span class="input-group-addon" id="storeNameLabel">Store Name</span>
+			<select id='storeName' class="form-control">
+				
+			</select>
+		</div><br />
+		<div class="input-group">
+		 <span class="input-group-addon" id="storeNameLabel">Price</span>
+			<div class="input-group price">
+				<div class="input-group-addon">Small</div>
+				<input type="text" class="form-control" id="price1" value="N.A.">
+				<div class="input-group-addon">SGD</div>
+			</div>
+			<div class="input-group price">
+				<div class="input-group-addon">Medium</div>
+				<input type="text" class="form-control" id="price2" value="N.A.">
+				<div class="input-group-addon">SGD</div>
+			</div>
+			<div class="input-group price">
+				<div class="input-group-addon">Big</div>
+				<input type="text" class="form-control" id="price3" value="N.A.">
+				<div class="input-group-addon">SGD</div>
+			</div>				
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelChange" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="saveChange" type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+$(function(){
+	var productsController = new Vue({
+		el: '#container',
+		methods: {
+			onDelete: function(id, e){
+				if(confirm("Delete this record?")){
+					$.ajax({
+						type: "DELETE",
+						url: '/product',
+						data: {id: id},
+						dataType: 'json',
+						success: function(result){
+							console.log(result.message);
+							load();
+						},
+						error: function(jqXhr, textStatus, errorThrown){
+							console.log(errorThrown);
+						}
+					});
+				}
+			}
+		}
+	});
+	
+	//edit or create flag
+	var METHOD = "POST";
+
+	//get products
+	function load(){
+		$.ajax({
+			type: "GET",
+			url: '/products',
+			dataType: 'json',
+			beforeSend: function (xhr) {
+
+			},
+			complete: function(){
+					
+			},
+			success: function (result, textStatus, jqXHR) {							
+				productsController.$data = result;
+			},
+			error: function(xhr, textStatus, errorThrown){
+				alert("Error in getting addons "+textStatus);
+			}
+		});
+	}
+	load();
+	
+	//edit modal
+	$('#editModal').on('show.bs.modal', function (e) {
+ 		var target = e.relatedTarget;
+ 		var name = target.dataset.name;
+		var type = target.dataset.type;
+ 		var storeName = target.dataset.store;
+		var price = target.dataset.price ? target.dataset.price.split(',') : ['N.A.', 'N.A.', 'N.A.'];
+		
+ 		if(name){
+ 			METHOD = "PUT";
+ 		}
+		
+		$.ajax({
+			type: 'GET',
+			url: '/stores',
+			dataType: 'json',
+			success: function(result){
+				result.stores.forEach(function(store, index){
+					var option = $("<option>");
+					option.text(store.name);
+					$("#storeName").append(option);
+				});
+				
+			},
+			error: function(jqXhr, textStatus, errorThrown){
+				console.log(errorThrown);
+			}
+		});
+		
+		
+		$("#modalLabel").text(target.textContent);
+		
+		$('#pk').val(target.dataset.pk);
+ 		$('#productName').val(name);
+		$('#type').val(type);
+ 		$('#storeName').val(storeName);
+		$('#price1').val(price[0]);
+		$('#price2').val(price[1]);
+		$('#price3').val(price[2]);
+	});
+
+	//cancel changes
+	$('#cancelChange').click(function(){
+		$('#storeName').val('');
+		$('#productName').val('');
+ 		$('#type').val('');
+		$('#price1').val();
+		$('#price2').val();
+		$('#price3').val();
+	});
+		
+	//save changes
+	$('#saveChange').click(function(){
+		
+		var product = {};
+		var pk = $('#pk').val();
+		var name = $('#productName').val();
+		var type = $('#type').val();
+ 		var storeName = $('#storeName').val();
+		var price = [];
+		price.push($('#price1').val());
+		price.push($('#price2').val());
+		price.push($('#price3').val());
+		
+ 		$('#editModal').modal('hide');
+		
+ 		product = {
+			id: pk,
+ 			name: name,
+			storeName: storeName,
+ 			price: price,
+			type: type
+ 		}
+
+		$.ajax({
+			type: METHOD,
+			url: '/product',
+			data: product,
+			dataType: 'json',
+			success: function(result){
+				console.log(result.message);
+				load();
+			},
+			error: function(jqXhr, textStatus, errorThrown){
+				console.log(errorThrown);
+			}
+		});
+	});
+})
+	
+</script>

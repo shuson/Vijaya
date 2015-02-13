@@ -23,6 +23,10 @@ module.exports = {
     	type: 'array',
     	required: true
     },
+	storeName: {
+		type: 'string',
+		required: true
+	},
     addons : { 
     	type: 'array'
     }

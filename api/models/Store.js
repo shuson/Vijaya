@@ -22,16 +22,10 @@ module.exports = {
 
     address : { type: 'string' },
 
-    postcode : { type: 'string' },
-
     type : { 
     	type: 'string',
     	enum: ['Beverage', 'Food', 'Desert'],
     	defaultsTo: 'Beverage'
-	},
-
-	products: {
-		type: 'array'
 	}
   }
 };
