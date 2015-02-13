@@ -40,14 +40,27 @@ module.exports = {
    */
   query: function (req, res) {
 	var id = req.param('id');
-	Product.findOne({id: id}).exec(function(err, addon){
+	Product.findOne({id: id}).exec(function(err, product){
 		if(err){
 			return res.json({message: err});
 		}
-		return res.json(addon);
+		return res.json(product);
 	});
   },
-
+	
+  /**
+   * `ProductController.queryByStore()`
+   */
+  queryByStore: function (req, res) {
+	var store = req.param('store');
+	console.log(store);
+	Product.find({storeName: store}).exec(function(err, products){
+		if(err){
+			return res.json({message: err});
+		}
+		return res.json({products: products});
+	});
+  },
 
   /**
    * `ProductController.update()`

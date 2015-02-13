@@ -53,32 +53,32 @@ module.exports.routes = {
   * Store RESTful APIs
   *
   **/
-
-  'GET /Stores': {
-    controller: 'Store',
-    action: 'index'
-  },
-  
+ 
   'GET /admin/Stores': {
 	view: 'stores'
   },
   
-  'POST /Store': {
+  'GET /Stores': {
+    controller: 'Store',
+    action: 'index'
+  },
+ 
+  'POST /Store/create': {
     controller: 'Store',
     action: 'create'
   },
 
-  'PUT /Store': {
+  'PUT /Store/update': {
     controller: 'Store',
     action: 'update'
   },
   
-  'GET /Store:id': {
+  'GET /Store/:id': {
     controller: 'Store',
     action: 'query'
   },
   
-  'DELETE /Store': {
+  'DELETE /Store/delete': {
     controller: 'Store',
     action: 'delete'
   },
@@ -96,17 +96,27 @@ module.exports.routes = {
 	action: 'index'
   },
   
-  'POST /Product': {
+  'GET /Product/:id': {
+	controller: "Product",
+	action: 'query'
+  },
+  
+  'GET /Products/:store': {
+	controller: "Product",
+	action: 'queryByStore'
+  },
+  
+  'POST /Product/create': {
 	controller: "Product",
 	action: 'create'
   },
   
-  'PUT /Product': {
+  'PUT /Product/update': {
 	controller: "Product",
 	action: 'update'
   },
   
-  'DELETE /Product': {
+  'DELETE /Product/delete': {
 	controller: "Product",
 	action: 'delete'
   },
@@ -114,6 +124,10 @@ module.exports.routes = {
   /**
   *	Addons RESTful APIs and Backend Admin routes
   **/
+  
+  'GET /admin/addons': {
+	view: 'addons'
+  },
   
   'GET /Addons': {
 	   controller: "Addon",
@@ -125,21 +139,17 @@ module.exports.routes = {
 	   action: 'query',	
   },
   
-  'GET /admin/addons': {
-	view: 'addons'
-  },
-
-  'POST /addon': {
+  'POST /addon/create': {
       controller: "Addon",
       action: 'create'
   },
   
-  'PUT /addon': {
+  'PUT /addon/update': {
       controller: "Addon",
       action: 'update'
   },
   
-  'DELETE /addon': {
+  'DELETE /addon/delete': {
       controller: "Addon",
       action: 'delete'
   }
