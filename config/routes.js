@@ -49,6 +49,40 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
+   /**
+  * User RESTful APIs
+  *
+  **/
+ 
+  'GET /admin/users': {
+	view: 'user'
+  },
+  
+  'GET /users': {
+    controller: 'User',
+    action: 'index'
+  },
+ 
+  'POST /User/create': {
+    controller: 'User',
+    action: 'create'
+  },
+
+  'PUT /User/update': {
+    controller: 'User',
+    action: 'update'
+  },
+  
+  'GET /User/:username': {
+    controller: 'User',
+    action: 'query'
+  },
+  
+  'DELETE /User/delete': {
+    controller: 'User',
+    action: 'delete'
+  },
+  
   /**
   * Store RESTful APIs
   *

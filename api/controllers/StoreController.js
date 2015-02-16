@@ -25,11 +25,11 @@ module.exports = {
    */
   query: function (req, res) {
 	var id = req.param('id');
-	Store.findOne({id: id}).exec(function(err, addon){
+	Store.findOne({id: id}).exec(function(err, store){
 		if(err){
 			return res.json({message: err});
 		}
-		return res.json(addon);
+		return res.json(store);
 	});
   },
 
