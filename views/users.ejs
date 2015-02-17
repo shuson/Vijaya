@@ -17,7 +17,7 @@
 				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-username='{{username}}' data-nickname='{{nickname}}' data-password='{{password}}' >Edit</button>
 				<button class="btn btn-danger btn-sm" data-pk="{{id}}" v-on="click: onDelete(id, $event)">Delete</button>
 				|
-				<button class="btn btn-danger btn-sm" v-on="click: onSelect(id, $event)">Favourite Products</button>
+				<button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#favoModal" data-username='{{username}}' >Favourite Products</button>
 			</td>
 		</tr>
 	</table>
@@ -53,7 +53,40 @@
     </div>
   </div>
 </div>
+<div id="favoModal" class="modal fade">
+ <div class="modal-dialog" style="width:60%">
+  <div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="modalLabel">Favourite Products Management</h4>
+    </div>
+	<div class="modal-body row">
+		<div class="col-lg-4">
+			<label for="storesLabel">Store list:</label>
+			<select id="stores" class="form-control" multiple style="height: 280px;">
 
+			</select>
+		</div>
+		<div class="col-lg-4">
+			<label for="prodctsLabel">Product list:</label>
+			<select id="products" class="form-control" multiple style="height: 280px;">
+
+			</select>
+		</div>
+		<div class="col-lg-4" >
+			<label for="favoProductsLabel">Selected list:</label>
+			<ul id="favoProducts" class="list-group" style="height: 280px; overflow: scroll;">
+
+			</ul>
+		</div>
+	</div>
+	<div class="modal-footer">
+        <button id="favoCancel" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="favoSave" type="button" class="btn btn-primary">Save changes</button>
+    </div>
+  </div>
+ </div>
+</div>
 <script>
 
 $(function(){
@@ -149,6 +182,18 @@ $(function(){
 			alert("please fulfil the information");
 			return;
 		}
+		var favos;
+		$.ajax({
+			type: "GET",
+			url: '/user/'+username,
+			dataType: 'json',
+			success: function(result){
+				favos = result.favoProducts;
+			},
+			error: function(jqXhr, textStatus, errorThrown){
+				console.log(errorThrown);
+			}
+		});
 		
  		$('#editModal').modal('hide');
 		
@@ -157,13 +202,15 @@ $(function(){
 				id: pk,
 				username: username,
 				password: btoa(password),
-				nickname: nickname
+				nickname: nickname,
+				favoProducts: favos
 			}
 		}else if(METHOD == "POST"){	
 			user = {
 				username: username,
 				password: btoa(password),
-				nickname: nickname
+				nickname: nickname,
+				favoProducts: favos
 			}
 		}
 		
@@ -175,6 +222,144 @@ $(function(){
 			success: function(result){
 				console.log(result.message);
 				load();
+			},
+			error: function(jqXhr, textStatus, errorThrown){
+				console.log(errorThrown);
+			}
+		});
+	});
+	
+	//favo product modal
+	var favourites;
+	var favUser;
+	$('#favoModal').on('show.bs.modal', function (e) {
+ 		var target = e.relatedTarget;
+ 		var username = target.dataset.username;
+		
+		//init elements
+		favourites = [];
+		$("#favoProducts li").remove();
+		$("#stores option").remove();
+		$("#products option").remove();
+		
+		//get favo and render favo listview
+		$.ajax({
+			type: "GET",
+			url: '/user/'+username,
+			dataType: 'json',
+			success: function(result){
+				favourites = result.favoProducts;
+				favUser = result;
+				
+				favourites.forEach(function(favProd, index){
+					var favli = $("<li class='list-group-item'>")
+					var actionSpan = $("<span class='badge pointer clickToDelete' data-pk='"+favProd.prodId+"'>X</span>")
+					favli.append(actionSpan);
+					favli.append(favProd.prodName);
+					$("#favoProducts").append(favli);
+				});
+			},
+			error: function(jqXhr, textStatus, errorThrown){
+				console.log(errorThrown);
+			}
+		});
+		
+		//render store select
+		$.ajax({
+			type: "GET",
+			url: '/stores',
+			dataType: 'json',
+			success: function(result){
+				result.stores.forEach(function(store, index){
+					var option = $("<option>");
+					option.text(store.name);
+					$("#stores").append(option);
+				});
+			},
+			error: function(jqXhr, textStatus, errorThrown){
+				console.log(errorThrown);
+			}
+		});
+		
+	});
+	
+	//store select change event
+	$("#stores").change(function(){
+		var storeName = $(this).val()[0];
+		
+		$.ajax({
+			type: "GET",
+			url: '/products/'+storeName,
+			dataType: 'json',
+			success: function(result){
+				$("#products option").remove();
+				result.products.forEach(function(product, index){
+					var option = $("<option>");
+					option.val(product.id);
+					option.text(product.name);
+					$("#products").append(option);
+				});
+			},
+			error: function(jqXhr, textStatus, errorThrown){
+				console.log(errorThrown);
+			}
+		});
+	});
+	
+	//product select option double click event
+	$("#products").on('dblclick', 'option', function (){
+		var prodId = $(this).val();
+		var prodName = $(this).text();
+		var favli = $("<li class='list-group-item'>")
+		var innerFav = "<span class='badge pointer clickToDelete' data-pk='"+prodId+"'>X</span>" + prodName;
+		favli.html(innerFav);
+		
+		var favProd = {
+			prodId: prodId,
+			prodName: prodName
+		}
+		//check duplicates
+		var pushFlag = true;
+		favourites.forEach(function(prod, index){
+			if(prod.prodId == favProd.prodId){
+				pushFlag = false;
+			}
+		});
+		if(pushFlag){
+			favourites.push(favProd);
+			$("#favoProducts").append(favli);
+		}		
+	});
+	
+	//delete from favourites
+	$("#favoProducts").on('click', '.clickToDelete', function(){
+		$(this).parent().remove();
+		var prodId = $(this).data('pk');
+		
+		var tempArray = [];
+		
+		favourites.forEach(function(prod, index){
+			if(prod.prodId != prodId){
+				tempArray.push(prod);
+			}
+		});
+		
+		favourites = tempArray;
+	});
+	
+	//save changes
+	$("#favoSave").click(function(){
+		
+		favUser.favoProducts = favourites;
+		
+		$.ajax({
+			type: "PUT",
+			url: '/user/update',
+			dataType: 'json',
+			data: favUser,
+			success: function(result){
+				console.log(result);
+				$('#favoModal').modal('hide');
 			},
 			error: function(jqXhr, textStatus, errorThrown){
 				console.log(errorThrown);

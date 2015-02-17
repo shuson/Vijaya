@@ -50,7 +50,7 @@ module.exports = {
    */
   update: function (req, res) {
     var user = req.body;
-	User.update({id: user.id},user).exec(function(err, updated){
+	User.update({id: user.id}, user).exec(function(err, updated){
 		if (err) {
 			return res.json({message: err});
 		}else{
