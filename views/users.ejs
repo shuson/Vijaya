@@ -182,22 +182,23 @@ $(function(){
 			alert("please fulfil the information");
 			return;
 		}
-		var favos;
-		$.ajax({
-			type: "GET",
-			url: '/user/'+username,
-			dataType: 'json',
-			success: function(result){
-				favos = result.favoProducts;
-			},
-			error: function(jqXhr, textStatus, errorThrown){
-				console.log(errorThrown);
-			}
-		});
+		//by default put 1 dummy product to customer
+		var favos = [{prodId:'0', prodName: 'NA'}];
 		
  		$('#editModal').modal('hide');
 		
 		if(METHOD == "PUT"){
+			$.ajax({
+				type: "GET",
+				url: '/user/'+username,
+				dataType: 'json',
+				success: function(result){
+					favos = result.favoProducts;
+				},
+				error: function(jqXhr, textStatus, errorThrown){
+					console.log(errorThrown);
+				}
+			});
 			user = {
 				id: pk,
 				username: username,
@@ -213,7 +214,7 @@ $(function(){
 				favoProducts: favos
 			}
 		}
-		
+		console.log(user)
 		$.ajax({
 			type: METHOD,
 			url: url,
@@ -232,7 +233,7 @@ $(function(){
 	//favo product modal
 	var favourites;
 	var favUser;
-	$('#favoModal').on('show.bs.modal', function (e) {
+	$('#favoModal').on('show.bs.modal',function(e){
  		var target = e.relatedTarget;
  		var username = target.dataset.username;
 		
@@ -248,15 +249,17 @@ $(function(){
 			url: '/user/'+username,
 			dataType: 'json',
 			success: function(result){
-				favourites = result.favoProducts;
+				favourites = result.favoProducts || [];
 				favUser = result;
 				
 				favourites.forEach(function(favProd, index){
-					var favli = $("<li class='list-group-item'>")
-					var actionSpan = $("<span class='badge pointer clickToDelete' data-pk='"+favProd.prodId+"'>X</span>")
-					favli.append(actionSpan);
-					favli.append(favProd.prodName);
-					$("#favoProducts").append(favli);
+					if(favProd.prodName != 'NA'){
+						var favli = $("<li class='list-group-item'>")
+						var actionSpan = $("<span class='badge pointer clickToDelete' data-pk='"+favProd.prodId+"'>X</span>")
+						favli.append(actionSpan);
+						favli.append(favProd.prodName);
+						$("#favoProducts").append(favli);
+					}
 				});
 			},
 			error: function(jqXhr, textStatus, errorThrown){
@@ -320,6 +323,7 @@ $(function(){
 		}
 		//check duplicates
 		var pushFlag = true;
+		
 		favourites.forEach(function(prod, index){
 			if(prod.prodId == favProd.prodId){
 				pushFlag = false;

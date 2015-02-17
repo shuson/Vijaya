@@ -36,7 +36,7 @@ module.exports = {
 	*/
   create: function (req, res) {
 	var user = req.body;
-	
+	console.log(user)
 	User.create(user).exec(function(err, user){
 		if(err){
 			return res.json({message: err});
