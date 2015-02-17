@@ -7,8 +7,6 @@
 
 module.exports = {
 	
-
-
   /**
    * `UserController.index()`
    */
@@ -51,9 +49,15 @@ module.exports = {
    * `UserController.update()`
    */
   update: function (req, res) {
-    return res.json({
-      todo: 'update() is not implemented yet!'
-    });
+    var user = req.body;
+	User.update({id: user.id},user).exec(function(err, updated){
+		if (err) {
+			return res.json({message: err});
+		}else{
+			return res.json({message: updated});
+		}
+		console.log('Updated User to have name '+updated[0].username);		
+	});
   },
 
 
@@ -61,9 +65,14 @@ module.exports = {
    * `UserController.delete()`
    */
   delete: function (req, res) {
-    return res.json({
-      todo: 'delete() is not implemented yet!'
-    });
+    var user = req.body;
+	User.destroy({id: user.id}).exec(function afterwards(err){
+			if (err) {
+				return res.json({message: err});
+			}else{
+				return res.json({message: "Success"});
+			}
+	});
   }
 };
 

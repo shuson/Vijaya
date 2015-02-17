@@ -1,6 +1,9 @@
 <h3 class="container">Addon Administration Page</h3>
-
-<div id="container">
+<ol class="breadcrumb container">
+  <li><a href="/admin">Admin</a></li>
+  <li class="active">Addon</li>
+</ol>
+<div id="container" class="container">
 	<table id="addonsTable" class="table">
 		<tr>
 			<th>Name</th>
@@ -53,7 +56,7 @@
 					if(confirm("Delete this record?")){
 						$.ajax({
 							type: "DELETE",
-							url: '/addon',
+							url: '/addon/delete',
 							data: {id: id},
 							dataType: 'json',
 							success: function(result){
@@ -71,6 +74,7 @@
 
 		//edit or create flag
 		var METHOD = "POST";
+		var url = "/addon/create";
 
 		//get addons
 		function load(){
@@ -103,6 +107,7 @@
 			
  			if(name){
  				METHOD = "PUT";
+				url = "/addon/update"
  			}
 			
 			$("#modalLabel").text(target.textContent);
@@ -111,11 +116,13 @@
  			$('#addonName').val(name);
  			$('#addonPrice').val(price);
 		});
-
-		//cancel changes
-		$('#cancelChange').click(function(){
+		
+		$('#editModal').on('hidden.bs.modal', function (e) {
 			$('#addonName').val('');
  			$('#addonPrice').val('');
+			
+			METHOD = "POST";
+			url = "/addon/create";
 		});
 		
 		//save changes
@@ -126,15 +133,23 @@
 			var name = $('#addonName').val();
  			var price = $('#addonPrice').val();
  			$('#editModal').modal('hide')
- 			addon = {
-				id: pk,
- 				name: name,
- 				price: price
- 			}
+			
+			if(METHOD == 'POST'){
+				addon = {
+					name: name,
+					price: price
+				}
+			}else if(METHOD == 'PUT'){
+				addon = {
+					id: pk,
+					name: name,
+					price: price
+				}
+			}
 
 			$.ajax({
 				type: METHOD,
-				url: '/addon',
+				url: url,
 				data: addon,
 				dataType: 'json',
 				success: function(result){

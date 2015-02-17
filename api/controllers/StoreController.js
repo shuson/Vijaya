@@ -54,12 +54,7 @@ module.exports = {
    */
   update: function (req, res) {
 	var store = req.body;
-	Store.update({id: store.id},{
-		name: store.name,
-		brand: store.brand,
-		address: store.address,
-		type: store.type
-	}).exec(function(err, updated){
+	Store.update({id: store.id},store).exec(function(err, updated){
 		if (err) {
 			return res.json({message: err});
 		}else{

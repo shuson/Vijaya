@@ -1,15 +1,20 @@
 <h3 class="container">Product Management</h3>
-
-<div id="container">
+<ol class="breadcrumb container">
+  <li><a href="/admin">Admin</a></li>
+  <li><a href="/admin/stores">Store</a></li>
+  <li class="active">Product</li>
+</ol>
+<div id="container" class="container">
 	<table id="productTable" class="table">
 		<tr>
 			<th>Name</th>
 			<th>Type</th>
 			<th>Store</th>
 			<th>Price</th>
+			<th>Addons</th>
 			<th>Action</th>
 		</tr>
-		<tr v-repeat='stores'>
+		<tr v-repeat='products'>
 			<td>{{name}}</td>
 			<td>{{type}}</td>
 			<td>{{storeName}}</td>
@@ -21,7 +26,12 @@
 				</ul>
 			</td>
 			<td>
-				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-name='{{name}}' data-type='{{type}}' data-store='{{storeName}}' data-price='{{price}}' >Edit</button> 			
+				<ul class="list-group">
+				  <li role="presentation" v-repeat='addons'>{{$value}}</li>
+				</ul>
+			</td>
+			<td>
+				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-name='{{name}}' data-type='{{type}}' data-store='{{storeName}}' data-price='{{price}}' data-addons="{{addons}}" >Edit</button> 			
 				<button class="btn btn-danger btn-sm" data-pk="{{id}}" v-on="click: onDelete(id, $event)">Delete</button>
 			</td>
 		</tr>
@@ -52,12 +62,10 @@
 		</div><br />
 		<div class="input-group">
 		  <span class="input-group-addon" id="storeNameLabel">Store Name</span>
-			<select id='storeName' class="form-control">
-				
-			</select>
+			<input id='storeName' type="text" class="form-control" placeholder="Store Name" readonly />
 		</div><br />
 		<div class="input-group">
-		 <span class="input-group-addon" id="storeNameLabel">Price</span>
+		 <span class="input-group-addon" id="priceLabel">Price</span>
 			<div class="input-group price">
 				<div class="input-group-addon">Small</div>
 				<input type="text" class="form-control" id="price1" value="N.A.">
@@ -73,6 +81,12 @@
 				<input type="text" class="form-control" id="price3" value="N.A.">
 				<div class="input-group-addon">SGD</div>
 			</div>				
+		</div><br />
+		<div class="input-group">
+		  <span class="input-group-addon" id="addonNameLabel">Addon Name</span>
+			<select id='addonName' class="form-control" multiple>
+				
+			</select>
 		</div>
       </div>
       <div class="modal-footer">
@@ -93,7 +107,7 @@ $(function(){
 				if(confirm("Delete this record?")){
 					$.ajax({
 						type: "DELETE",
-						url: '/product',
+						url: '/product/delete',
 						data: {id: id},
 						dataType: 'json',
 						success: function(result){
@@ -111,12 +125,14 @@ $(function(){
 	
 	//edit or create flag
 	var METHOD = "POST";
-
+	var url = "/product/create";
+	
 	//get products
 	function load(){
+		var storeName = window.location.pathname.substring(window.location.pathname.lastIndexOf('/'));
 		$.ajax({
 			type: "GET",
-			url: '/products',
+			url: '/products'+storeName,
 			dataType: 'json',
 			beforeSend: function (xhr) {
 
@@ -141,30 +157,37 @@ $(function(){
 		var type = target.dataset.type;
  		var storeName = target.dataset.store;
 		var price = target.dataset.price ? target.dataset.price.split(',') : ['N.A.', 'N.A.', 'N.A.'];
+		var addons = target.dataset.addons ||[];
+		
+		if(!storeName){
+			storeName = window.location.pathname.substring(window.location.pathname.lastIndexOf('/')+1);
+		}	
 		
  		if(name){
  			METHOD = "PUT";
+			url = "/product/update";
  		}
+			
+		$("#modalLabel").text(target.textContent);
 		
 		$.ajax({
 			type: 'GET',
-			url: '/stores',
+			url: '/addons',
 			dataType: 'json',
 			success: function(result){
-				result.stores.forEach(function(store, index){
+				$("#addonName option").remove();
+				result.addons.forEach(function(addon, index){
 					var option = $("<option>");
-					option.text(store.name);
-					$("#storeName").append(option);
+					option.text(addon.name);
+					$("#addonName").append(option);
 				});
 				
+				$('#addonName').val(addons);
 			},
 			error: function(jqXhr, textStatus, errorThrown){
 				console.log(errorThrown);
 			}
 		});
-		
-		
-		$("#modalLabel").text(target.textContent);
 		
 		$('#pk').val(target.dataset.pk);
  		$('#productName').val(name);
@@ -174,15 +197,16 @@ $(function(){
 		$('#price2').val(price[1]);
 		$('#price3').val(price[2]);
 	});
-
-	//cancel changes
-	$('#cancelChange').click(function(){
+	
+	$('#editModal').on('hidden.bs.modal', function (e) {
 		$('#storeName').val('');
 		$('#productName').val('');
  		$('#type').val('');
 		$('#price1').val();
 		$('#price2').val();
 		$('#price3').val();
+		METHOD = "POST";
+		url = "/product/create";
 	});
 		
 	//save changes
@@ -197,20 +221,37 @@ $(function(){
 		price.push($('#price1').val());
 		price.push($('#price2').val());
 		price.push($('#price3').val());
+		var addons = $('#addonName').val();
+		
+		if(!name || !storeName){
+			alert('Please fulfil the information!');
+			return;
+		}
 		
  		$('#editModal').modal('hide');
 		
- 		product = {
-			id: pk,
- 			name: name,
-			storeName: storeName,
- 			price: price,
-			type: type
- 		}
+ 		if(METHOD == "PUT"){
+			product = {
+				id: pk,
+				name: name,
+				storeName: storeName,
+				price: price,
+				type: type,
+				addons: addons
+			}
+		}else if(METHOD == "POST"){				
+			product = {
+				name: name,
+				storeName: storeName,
+				price: price,
+				type: type,
+				addons: addons
+			}
+		}
 
 		$.ajax({
 			type: METHOD,
-			url: '/product',
+			url: url,
 			data: product,
 			dataType: 'json',
 			success: function(result){

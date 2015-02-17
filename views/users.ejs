@@ -1,27 +1,23 @@
-<h3 class="container">Store Management</h3>
+<h3 class="container">User Management</h3>
 <ol class="breadcrumb container">
   <li><a href="/admin">Admin</a></li>
-  <li class="active">Store</li>
+  <li class="active">User</li>
 </ol>
 <div id="container" class="container">
 	<table id="storesTable" class="table">
 		<tr>
-			<th>Name</th>
-			<th>Brand</th>
-			<th>Address</th>
-			<th>Type</th>
+			<th>User Name</th>
+			<th>Nickname</th>
 			<th>Action</th>
 		</tr>
-		<tr v-repeat='stores'>
+		<tr v-repeat='users'>
+			<td>{{username}}</td>
+			<td>{{nickname}}</td>
 			<td>
-				<a href="/admin/products/{{name}}">{{name}}</a>
-			</td>
-			<td>{{brand}}</td>
-			<td>{{address}}</td>
-			<td>{{type}}</td>
-			<td>
-				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-name='{{name}}' data-address='{{address}}' data-brand='{{brand}}' data-type='{{type}}'>Edit</button> 			
+				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-username='{{username}}' data-nickname='{{nickname}}' data-password='{{password}}' >Edit</button>
 				<button class="btn btn-danger btn-sm" data-pk="{{id}}" v-on="click: onDelete(id, $event)">Delete</button>
+				|
+				<button class="btn btn-danger btn-sm" v-on="click: onSelect(id, $event)">Favourite Products</button>
 			</td>
 		</tr>
 	</table>
@@ -38,25 +34,17 @@
       <div class="modal-body">
 		<input id='pk' type="hidden" class="form-control" />
 		<div class="input-group">
-		  <span class="input-group-addon" id="nameLabel">Name</span>
-		  <input id='storeName' type="text" class="form-control" placeholder="Store Name" />
+		  <span class="input-group-addon" id="nameLabel">User Name</span>
+		  <input id='username' type="text" class="form-control" placeholder="User Name" />
 		</div><br />
 		<div class="input-group">
-		  <span class="input-group-addon" id="addressLabel">Brand</span>
-		  <input id='brand' type="text" class="form-control" placeholder="brand" />
+		  <span class="input-group-addon" id="nameLabel">Password</span>
+		  <input id='password' type="password" class="form-control" placeholder="Password" />
 		</div><br />
 		<div class="input-group">
-		  <span class="input-group-addon" id="addressLabel">Address</span>
-		  <input id='address' type="text" class="form-control" placeholder="address" />
+		  <span class="input-group-addon" id="addressLabel">Nickname</span>
+		  <input id='nickname' type="text" class="form-control" placeholder="Nickname" />
 		</div><br />
-		<div class="input-group">
-		  <span class="input-group-addon" id="addressLabel">Type</span>
-			<select id='type' class="form-control">
-				<option>Beverage</option>
-				<option>Food</option>
-				<option>Desert</option>
-			</select>
-		</div>
       </div>
       <div class="modal-footer">
         <button id="cancelChange" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -69,14 +57,14 @@
 <script>
 
 $(function(){
-	var storeController = new Vue({
+	var userController = new Vue({
 		el: '#container',
 		methods: {
 			onDelete: function(id, e){
 				if(confirm("Delete this record?")){
 					$.ajax({
 						type: "DELETE",
-						url: '/store/delete',
+						url: '/user/delete',
 						data: {id: id},
 						dataType: 'json',
 						success: function(result){
@@ -94,13 +82,13 @@ $(function(){
 	
 	//edit or create flag
 	var METHOD = "POST";
-	var url = "/store/create"
+	var url = "/user/create";
 
 	//get store
 	function load(){
 		$.ajax({
 			type: "GET",
-			url: '/stores',
+			url: '/users',
 			dataType: 'json',
 			beforeSend: function (xhr) {
 
@@ -109,10 +97,10 @@ $(function(){
 					
 			},
 			success: function (result, textStatus, jqXHR) {							
-				storeController.$data = result;
+				userController.$data = result;
 			},
 			error: function(xhr, textStatus, errorThrown){
-				alert("Error in getting stores "+textStatus);
+				alert("Error in getting Users "+textStatus);
 			}
 		});
 	}
@@ -121,73 +109,68 @@ $(function(){
 	//edit modal
 	$('#editModal').on('show.bs.modal', function (e) {
  		var target = e.relatedTarget;
- 		var name = target.dataset.name;
-		var brand = target.dataset.brand;
- 		var address = target.dataset.address;
-		var type = target.dataset.type;
+ 		var username = target.dataset.username;
+		var password = target.dataset.password;
+		var nickname = target.dataset.nickname;
 		
- 		if(name){
+ 		if(username){
  			METHOD = "PUT";
-			url = "/store/update"
+			url = "/user/update";
+			$("#password").attr("placeholder", "Leave it empty if no changes");
  		}
 			
 		$("#modalLabel").text(target.textContent);
 		
 		$('#pk').val(target.dataset.pk);
- 		$('#storeName').val(name);
-		$('#brand').val(brand);
- 		$('#address').val(address);
-		$('#type').val(type);
+ 		$('#username').val(username);
+		$("#password").val(password);
+		$('#nickname').val(nickname);
 	});
 	
 	$('#editModal').on('hidden.bs.modal', function (e) {
-		$('#storeName').val('');
-		$('#brand').val('');
-		$('#address').val('');
-		$('#type').val('Beverage');
+		$('#username').val('');
+		$("#password").attr("placeholder", "Password");
+		$('#nickname').val('');
 			
 		METHOD = "POST";
-		url = "/store/create";
+		url = "/user/create";
 	});
 		
 	//save changes
 	$('#saveChange').click(function(){
 		//confirm("Save Changes?");
-		var store = {};
+		var user = {};
 		var pk = $('#pk').val();
-		var name = $('#storeName').val();
-		var brand = $('#brand').val();
- 		var address = $('#address').val();
-		var type = $('#type').val();
+		var username = $('#username').val();
+		var password = $('#password').val();
+		var nickname = $('#nickname').val();
 		
-		if(!name || !brand || !address){
-			alert('Please fulfil the information');
+		if(!username || !password){
+			alert("please fulfil the information");
 			return;
 		}
 		
  		$('#editModal').modal('hide');
 		
 		if(METHOD == "PUT"){
-			store = {
+			user = {
 				id: pk,
-				name: name,
-				brand: brand,
-				address: address,
-				type: type
+				username: username,
+				password: btoa(password),
+				nickname: nickname
 			}
-		}else if(METHOD == "POST"){
-			store = {
-				name: name,
-				brand: brand,
-				address: address,
-				type: type
+		}else if(METHOD == "POST"){	
+			user = {
+				username: username,
+				password: btoa(password),
+				nickname: nickname
 			}
 		}
-
+		
 		$.ajax({
 			type: METHOD,
 			url: url,
-			data: store,
+			data: user,
 			dataType: 'json',
 			success: function(result){
 				console.log(result.message);

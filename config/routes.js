@@ -55,7 +55,7 @@ module.exports.routes = {
   **/
  
   'GET /admin/users': {
-	view: 'user'
+	view: 'users'
   },
   
   'GET /users': {
@@ -121,7 +121,7 @@ module.exports.routes = {
   *	Products RESTful APIs and Backend Admin routes
   **/
   
-  'GET /admin/Products': {
+  'GET /admin/Products/:store': {
 	view: 'products'
   },
   

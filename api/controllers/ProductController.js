@@ -15,7 +15,7 @@ module.exports = {
   index: function (req, res) {
 	
 	Product.find().exec(function(err, products){
-        return res.json({stores: products});
+        return res.json({products: products});
     });
   },
 
@@ -53,7 +53,6 @@ module.exports = {
    */
   queryByStore: function (req, res) {
 	var store = req.param('store');
-	console.log(store);
 	Product.find({storeName: store}).exec(function(err, products){
 		if(err){
 			return res.json({message: err});
@@ -67,12 +66,7 @@ module.exports = {
    */
   update: function (req, res) {
     var product = req.body;
-	Product.update({id: product.id},{
-		name: product.name,
-		price: product.price,
-		storeName: product.storeName,
-		type: product.type
-	}).exec(function(err, updated){
+	Product.update({id: product.id},product).exec(function(err, updated){
 		if (err) {
 			return res.json({message: err});
 		}else{
