@@ -183,7 +183,7 @@ $(function(){
 			return;
 		}
 		//by default put 1 dummy product to customer
-		var favos = [{prodId:'0', prodName: 'NA'}];
+		var favos = [{prodId:'0', prodName: 'NA', storeName: 'NA'}];
 		
  		$('#editModal').modal('hide');
 		
@@ -313,13 +313,15 @@ $(function(){
 	$("#products").on('dblclick', 'option', function (){
 		var prodId = $(this).val();
 		var prodName = $(this).text();
+		var storeName = $('#stores').val()[0];
 		var favli = $("<li class='list-group-item'>")
 		var innerFav = "<span class='badge pointer clickToDelete' data-pk='"+prodId+"'>X</span>" + prodName;
 		favli.html(innerFav);
 		
 		var favProd = {
 			prodId: prodId,
-			prodName: prodName
+			prodName: prodName,
+			storeName: storeName
 		}
 		//check duplicates
 		var pushFlag = true;

@@ -140,11 +140,11 @@ $(function(){
 			complete: function(){
 					
 			},
-			success: function (result, textStatus, jqXHR) {							
+			success: function (result, textStatus, jqXHR) {
 				productsController.$data = result;
 			},
 			error: function(xhr, textStatus, errorThrown){
-				alert("Error in getting addons "+textStatus);
+				alert("Error in getting products "+textStatus);
 			}
 		});
 	}
@@ -230,7 +230,7 @@ $(function(){
 		
  		$('#editModal').modal('hide');
 		
- 		if(METHOD == "PUT"){
+		if(METHOD == "PUT"){
 			product = {
 				id: pk,
 				name: name,
@@ -248,7 +248,7 @@ $(function(){
 				addons: addons
 			}
 		}
-
+		
 		$.ajax({
 			type: METHOD,
 			url: url,

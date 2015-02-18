@@ -35,9 +35,12 @@ module.exports.routes = {
   '/': {
     view: 'homepage'
   },
-  '/admin': {
-    view: 'admin'
+  '/admin/*': {
+		policy: 'sessionAuth'
   },
+  '/admin': {
+		view: 'admin'
+   },
 
   /***************************************************************************
   *                                                                          *
@@ -110,6 +113,11 @@ module.exports.routes = {
   'GET /Store/:id': {
     controller: 'Store',
     action: 'query'
+  },
+  
+  'GET /Store/byname/:storename': {
+    controller: 'Store',
+    action: 'getByName'
   },
   
   'DELETE /Store/delete': {
@@ -186,5 +194,19 @@ module.exports.routes = {
   'DELETE /addon/delete': {
       controller: "Addon",
       action: 'delete'
+  },
+  
+  /**
+  * custom url
+  */
+  
+  'GET /favstores/:username' :{
+	  controller: 'User',
+	  action: 'getFavStores'
+  },
+  
+  'POST /auth/login': {
+	  controller: 'Auth',
+	  action: 'login'
   }
 };

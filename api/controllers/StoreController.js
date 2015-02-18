@@ -87,5 +87,18 @@ module.exports = {
       todo: 'test() is not implemented yet!'
     });
   },
+  
+  /**
+   * `StoreController.getByName()`
+   */
+  getByName: function (req, res) {
+	var storename = req.param('storename');
+	Store.findOne({name: storename}).exec(function(err, store){
+		if(err){
+			return res.json({message: err});
+		}
+		return res.json(store);
+	});
+  },
 };
 
