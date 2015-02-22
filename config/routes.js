@@ -201,8 +201,13 @@ module.exports.routes = {
   */
   
   'GET /favstores/:username' :{
-	  controller: 'User',
+	  controller: 'Main',
 	  action: 'getFavStores'
+  },
+
+  'GET /favproducts/:username/:storename' :{
+    controller: 'Main',
+    action: 'getFavProducts'
   },
   
   'POST /auth/login': {

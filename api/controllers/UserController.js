@@ -74,28 +74,5 @@ module.exports = {
 			}
 	});
   },
-  
-  /**
-   * `UserController.getFavStores()`
-   */
-  getFavStores: function (req, res) {
-	var username = req.param('username');
-	
-    User.findOne({username: username}).exec(function(err, user){
-		if(err){
-			return res.json({message: err});
-		}
-		var favoProds = user.favoProducts;
-		var stores = [];
-		favoProds.forEach(function(favProd, index){
-			console.log(favProd);
-			if(favProd.prodId != '0'){
-				stores.push(favProd.storeName);
-			}
-		});
-		console.log("fav stores:"+stores);
-		return res.json({stores: stores});
-	});
-  },
 };
 
