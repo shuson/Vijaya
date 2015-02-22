@@ -1,7 +1,6 @@
 #This document describes the RESTful APIs
 
 1. get store list <br />
-
 >method: GET<br />
 >argus: null<br />
 >url:
@@ -32,7 +31,6 @@ http://128.199.64.217/store/byname/:storename
 >return: json<br />
 
 4. get prodoct list <br />
-
 >method: GET<br />
 >argus: null<br />
 >url:
