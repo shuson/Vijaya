@@ -29,14 +29,26 @@ module.exports = {
 		}
 
 		var favoProds = user.favoProducts;
+		var storeNames = [];
 		var stores = [];
 		favoProds.forEach(function(favProd, index){
-			if(favProd.prodId != '0'){
-				stores.push(favProd.storeName);
+			if(favProd.prodId != '0' && storeNames.indexOf(favProd.storeName) < 0){
+				storeNames.push(favProd.storeName);
 			}			
 		});
-
-		return res.json({stores: stores});
+		
+		storeNames.forEach(function(name){
+			StoreService.getByName(name, function(err, store){
+				if(err){
+					return res.json({Message: err});
+				}
+				
+				stores.push(store);
+				if(stores.length == storeNames.length){
+					return res.json({stores: stores});
+				}
+			});
+		});
 	});
   },
 
