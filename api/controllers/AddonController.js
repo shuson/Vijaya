@@ -60,7 +60,7 @@ module.exports = {
    */
   update: function (req, res) {
 	var addon = req.body;
-	Addon.update({id: addon.id},addon).exec(function afterwards(err,updated){
+	Addon.update({id: addon.id}, addon).exec(function afterwards(err,updated){
 		if (err) {
 			return res.json({message: err});
 		}else{

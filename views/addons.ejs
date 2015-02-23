@@ -7,14 +7,18 @@
 	<table id="addonsTable" class="table">
 		<tr>
 			<th>Name</th>
+			<th>Short Name</th>
+			<th>Description</th>
 			<th>Price</th>
 			<th>Action</th>
 		</tr>
 		<tr v-repeat='addons'>
 			<td>{{name}}</td>
+			<td>{{shortName}}</td>
+			<td>{{description}}</td>
 			<td>{{price}}</td>
 			<td>
-				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-addonname='{{name}}' data-addonprice='{{price}}'>Edit</button> 			
+				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-addonname='{{name}}' data-addonshortname='{{shortName}}'  data-addondescription='{{description}}' data-addonprice='{{price}}'>Edit</button> 			
 				<button class="btn btn-danger btn-sm" data-pk="{{id}}" v-on="click: onDelete(id, $event)">Delete</button>
 			</td>
 		</tr>
@@ -34,6 +38,14 @@
 		<div class="input-group">
 		  <span class="input-group-addon" id="addonNameLabel">Addon Name</span>
 		  <input id='addonName' type="text" class="form-control" placeholder="Addon Name" />
+		</div><br />
+		<div class="input-group">
+		  <span class="input-group-addon" id="addonShortNameLabel">Short Name</span>
+		  <input id='shortName' type="text" class="form-control" placeholder="Short Name" />
+		</div><br />
+		<div class="input-group">
+		  <span class="input-group-addon" id="addonDescriptionLabel">Description</span>
+		  <input id='description' type="text" class="form-control" placeholder="Description" />
 		</div><br />
 		<div class="input-group">
 		  <span class="input-group-addon" id="addonPriceLabel">Addon Price</span>
@@ -103,6 +115,8 @@
 		$('#editModal').on('show.bs.modal', function (e) {
  			var target = e.relatedTarget;
  			var name = target.dataset.addonname;
+			var shortName = target.dataset.addonshortname;
+			var description = target.dataset.description;
  			var price = target.dataset.addonprice;
 			
  			if(name){
@@ -114,6 +128,8 @@
 			
 			$('#pk').val(target.dataset.pk);
  			$('#addonName').val(name);
+			$('#shortName').val(shortName);
+			$('#description').val(description);
  			$('#addonPrice').val(price);
 		});
 		
@@ -131,18 +147,24 @@
 			var addon = {};
 			var pk = $('#pk').val();
 			var name = $('#addonName').val();
+			var shortName = $('#shortName').val();
+			var description = $('#description').val();
  			var price = $('#addonPrice').val();
  			$('#editModal').modal('hide')
 			
 			if(METHOD == 'POST'){
 				addon = {
 					name: name,
+					shortName: shortName,
+					description: description,
 					price: price
 				}
 			}else if(METHOD == 'PUT'){
 				addon = {
 					id: pk,
 					name: name,
+					shortName: shortName,
+					description: description,
 					price: price
 				}
 			}

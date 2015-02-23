@@ -14,6 +14,16 @@ module.exports = {
     	required: true,
     	unique: true
     },
+	
+	shortName: {
+		type: 'string',
+		required: true
+	},
+	
+	description: {
+		type: 'string',
+		required: true
+	},
 
     price : {
     	type: 'float'

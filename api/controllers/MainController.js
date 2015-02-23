@@ -18,7 +18,7 @@ module.exports = {
 
 
   /**
-   * `UserController.getFavStores()`
+   * `MainController.getFavStores()`
    */
   getFavStores: function (req, res) {
 	var username = req.param('username');
@@ -53,7 +53,7 @@ module.exports = {
   },
 
     /**
-   * `UserController.getFavProducts()`
+   * `MainController.getFavProducts()`
    */
   getFavProducts: function (req, res) {
 	var username = req.param('username');
@@ -64,13 +64,27 @@ module.exports = {
 			return res.json({message: err});
 		}
 		var favoProds = user.favoProducts;
+		var productIds = [];
 		var products = [];
 		favoProds.forEach(function(favProd, index){
 			if(favProd.prodId != '0' && favProd.storeName == storename){
-				products.push(favProd.prodId);
+				productIds.push(favProd.prodId);
 			}
 		});
-		return res.json({products: products});
+		
+		productIds.forEach(function(id){
+			ProductService.getById(id, function(err, product){
+				if(err){
+					return res.json({message: err});
+				}
+				
+				products.push(product);
+				
+				if(products.length == productIds.length){
+					return res.json({products: products});
+				}
+			});
+		});
 	});
   },
 };

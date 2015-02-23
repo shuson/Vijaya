@@ -11,8 +11,20 @@ module.exports = {
 
     name : { 
     	type: 'string',
-    	required: true
+    	required: true,
+		unique: true
     },
+	
+	shortName: {
+		type: 'string',
+		required: true
+	},
+	
+	description: {
+		type: 'string',
+		required: true
+	},
+	
     type : { 
     	type: 'string',
     	enum: ['Coffee', 'Juice', 'Chocolate'],

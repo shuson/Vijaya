@@ -8,6 +8,8 @@
 	<table id="productTable" class="table">
 		<tr>
 			<th>Name</th>
+			<th>Short Name</th>
+			<th>Description</th>
 			<th>Type</th>
 			<th>Store</th>
 			<th>Price</th>
@@ -16,6 +18,8 @@
 		</tr>
 		<tr v-repeat='products'>
 			<td>{{name}}</td>
+			<td>{{shortName}}</td>
+			<td>{{description}}</td>
 			<td>{{type}}</td>
 			<td>{{storeName}}</td>
 			<td>
@@ -31,7 +35,7 @@
 				</ul>
 			</td>
 			<td>
-				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-name='{{name}}' data-type='{{type}}' data-store='{{storeName}}' data-price='{{price}}' data-addons="{{addons}}" >Edit</button> 			
+				<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" data-pk="{{id}}" data-name='{{name}}' data-shortname='{{name}}' data-description='{{name}}' data-type='{{type}}' data-store='{{storeName}}' data-price='{{price}}' data-addons="{{addons}}" >Edit</button> 			
 				<button class="btn btn-danger btn-sm" data-pk="{{id}}" v-on="click: onDelete(id, $event)">Delete</button>
 			</td>
 		</tr>
@@ -51,6 +55,14 @@
 		<div class="input-group">
 		  <span class="input-group-addon" id="nameLabel">Name</span>
 		  <input id='productName' type="text" class="form-control" placeholder="Product Name" />
+		</div><br />
+		<div class="input-group">
+		  <span class="input-group-addon" id="shortNameLabel">Short Name</span>
+		  <input id='shortName' type="text" class="form-control" placeholder="Short Name" />
+		</div><br />
+		<div class="input-group">
+		  <span class="input-group-addon" id="descriptionLabel">Description</span>
+		  <input id='description' type="text" class="form-control" placeholder="Product Description" />
 		</div><br />
 		<div class="input-group">
 		  <span class="input-group-addon" id="addressLabel">Type</span>
@@ -154,6 +166,8 @@ $(function(){
 	$('#editModal').on('show.bs.modal', function (e) {
  		var target = e.relatedTarget;
  		var name = target.dataset.name;
+		var shortName = target.dataset.shortname;
+		var description = target.dataset.description;
 		var type = target.dataset.type;
  		var storeName = target.dataset.store;
 		var price = target.dataset.price ? target.dataset.price.split(',') : ['N.A.', 'N.A.', 'N.A.'];
@@ -191,6 +205,8 @@ $(function(){
 		
 		$('#pk').val(target.dataset.pk);
  		$('#productName').val(name);
+		$('#shortName').val(shortName);
+		$('#description').val(description);
 		$('#type').val(type);
  		$('#storeName').val(storeName);
 		$('#price1').val(price[0]);
@@ -201,6 +217,8 @@ $(function(){
 	$('#editModal').on('hidden.bs.modal', function (e) {
 		$('#storeName').val('');
 		$('#productName').val('');
+		$('#shortName').val('');
+		$('#description').val('');
  		$('#type').val('');
 		$('#price1').val();
 		$('#price2').val();
@@ -215,6 +233,8 @@ $(function(){
 		var product = {};
 		var pk = $('#pk').val();
 		var name = $('#productName').val();
+		var shortName = $('#shortName').val();
+		var description = $('#description').val();
 		var type = $('#type').val();
  		var storeName = $('#storeName').val();
 		var price = [];
@@ -234,6 +254,8 @@ $(function(){
 			product = {
 				id: pk,
 				name: name,
+				shortName: shortName,
+				description: description,
 				storeName: storeName,
 				price: price,
 				type: type,
@@ -242,6 +264,8 @@ $(function(){
 		}else if(METHOD == "POST"){				
 			product = {
 				name: name,
+				shortName: shortName,
+				description: description,
 				storeName: storeName,
 				price: price,
 				type: type,

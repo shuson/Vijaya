@@ -70,7 +70,7 @@ http://128.199.64.217/addons
 <br />
 >return: json<br />
 
-8. get favourite store name list by username<br />
+8. get favourite store list by username<br />
 >method: GET <br />
 >argus: username <br />
 >url:
@@ -80,7 +80,7 @@ http://128.199.64.217/favstores/:username
 <br />
 >return: json<br />
 
-9. get favourite product id list by username and storename<br />
+9. get favourite product list by username and storename<br />
 >method: GET <br />
 >argus: username, storename<br />
 >url:
